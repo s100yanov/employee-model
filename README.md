@@ -1,8 +1,8 @@
 # Employee Model
 ----------------
-## Model, representing an employee of corporation, including some basic properties and bahaviors. The model consists of Interface, parent Class, child Class, three helper Classes. 
+## Model, representing an employee of corporation, including some basic properties and behaviors. The model consists of Interface, parent Class, child Class, three helper Classes. 
 
-- CompanyStaff - Intefrace
+- CompanyStaff - Interface
 - Employee - Parent Class, the main module
 - Expert - Child Class, adds some extra details and functionality
 - AssetsAllocator - helper Class of Employee
@@ -23,7 +23,7 @@
 - Automatic design of Expert profile, setting structurally distinctive properties, modification of the basic Employee Salary, Assets and ID, reflecting the specific characteristics of the Expert
 - Validation and control of the hierarchy
 
-## The model works with the standard input and output. The validation requires specific syntax of the input. 
+## The model works with the standard input and output. The validation requires specific syntax for the input. 
 
 ### ++Valid input data:++
 

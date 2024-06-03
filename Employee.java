@@ -2,12 +2,9 @@ package EmployeeModel;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-public class Employee implements CompanyStaff {
+public class Employee implements CompanyStaff, Cloneable {
 
     private String name;
     private String surname;
@@ -17,11 +14,11 @@ public class Employee implements CompanyStaff {
     private String id;
     private String eMailAddress;
     private double salary;
-    private int salaryBase = 1000;
+    private final int salaryBase = 1000;
     private List<String> assets;
     private List<Employee> subordinates;
     private Employee superior;
-    private static AssetsAllocator allocator;
+    private static final AssetsAllocator allocator;
     private static int totalCountOfEmployees;
 
     static {
@@ -110,45 +107,75 @@ public class Employee implements CompanyStaff {
     }
 
     public List<String> getAssets() {
-        return Collections.unmodifiableList(this.assets);
+        return new ArrayList<>(this.assets);
     }
 
-    private void setAssets(){
+    private void setAssets() {
         this.assets = new ArrayList<>(allocator.defaultAssetsAllocator());
     }
 
-    public List<Employee> getSubordinates() {
-        return Collections.unmodifiableList(subordinates);
-    }
-
-    public void setSubordinates(List<Employee> subordinates) throws IllegalArgumentException {
-        for (Employee person : subordinates) {
-            setSubordinates(person);
+    public List<Employee> getSubordinates() throws CloneNotSupportedException {
+       List<Employee> cloned = new ArrayList<>();
+        for (Employee original : this.subordinates) {
+            cloned.add((Employee) original.clone());
         }
+        return cloned;
     }
 
-    public void setSubordinates(Employee subordinate) throws IllegalArgumentException {
+    public void setSubordinates(List<Employee> subordinates, Employee superior) throws IllegalArgumentException {
+        subordinates.forEach(employee -> {
+            try {
+                superior.setSubordinates(employee, this);
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void setSubordinates(Employee subordinate, Employee superior) throws IllegalArgumentException, CloneNotSupportedException {
+        if (this != superior) {
+            throw new IllegalArgumentException("Invalid input! Employee can only set subordinates to itself.");        
+        }
         if (subordinate.level >= this.level) {
-            throw new IllegalArgumentException("Subordinate cannot be equal or higher " +
-                    "in hierarchy than it's superior!");
+            throw new IllegalArgumentException("Invalid input! Subordinate cannot be equal or higher " +
+                    "in hierarchy than it's superior! " + subordinate);
         }
-        subordinates.add(subordinate);
-        setSuperior(this, subordinate);
+        if (checkSuperior(subordinate)) {
+            throw new IllegalArgumentException("Invalid input! This subordinate already has a superior!");
+        }
+
+        Employee clonedSubordinate = (Employee) subordinate.clone();
+        this.subordinates.add(clonedSubordinate);
+        subordinate.setSuperior(superior, subordinate);
     }
 
-    public Employee getSuperior() {
-        return this.superior;
+    public Employee getSuperior() throws CloneNotSupportedException {
+        return superior != null ? (Employee) superior.clone() : null;
     }
 
-    public void setSuperior(Employee superior, Employee subordinate) throws IllegalArgumentException {
-        if (this != subordinate && this != superior) {
-            throw new IllegalArgumentException("Invalid input! Employee can only set superior to himself.");
+    public void setSuperior(Employee superior, Employee subordinate) throws IllegalArgumentException, CloneNotSupportedException {
+        if (this != subordinate) {
+            throw new IllegalArgumentException("Invalid input! Employee can only set superior to itself.");
         }
-        if (superior.level <= subordinate.level || subordinate.getSuperior() != null) {
+        if (superior.level <= subordinate.level || checkSuperior(subordinate)) {
             throw new IllegalArgumentException("Invalid input! Superior is either lower in hierarchy " +
                     "than it's subordinate or this subordinate already has a superior!");
         }
-        subordinate.superior = superior;
+
+        subordinate.superior = (Employee) superior.clone();
+        Employee clonedSubordinate = (Employee) subordinate.clone();
+
+        if (!checkSubordinate(superior, this)) {
+            superior.subordinates.add(clonedSubordinate);
+        }
+    }
+
+    private boolean checkSubordinate(Employee superior, Employee subordinate) {
+        return superior.subordinates.stream().anyMatch(x -> x.equals(subordinate));
+    }
+
+    private boolean checkSuperior(Employee subordinate) {
+        return subordinate.superior != null;
     }
 
     protected int getSalaryBase() {
@@ -160,7 +187,7 @@ public class Employee implements CompanyStaff {
             return person.salary();
         }
         throw new Exception("Unauthorized access! " +
-                "Your position does not have access to this information.");
+                "Your position does not provide access to this information.");
     }
 
     protected void senioritySpecificAssetsAllocation(int level) {
@@ -192,7 +219,7 @@ public class Employee implements CompanyStaff {
         if (this.experienceInYears > 5 && this.experienceInYears <= 10) {
             experienceCoefficient = 1.5;
         }
-        else if(this.experienceInYears > 10 && this.experienceInYears <= 20){
+        else if(this.experienceInYears > 10 && this.experienceInYears <= 20) {
             experienceCoefficient = 2;
         }
         else if(this.experienceInYears > 20) {
@@ -203,15 +230,57 @@ public class Employee implements CompanyStaff {
     }
 
     @Override
-    public String id() { return this.id; }
+    public Object clone() throws CloneNotSupportedException {
+        Employee clonedEmployee = (Employee) super.clone();
+
+        clonedEmployee.assets = new ArrayList<>(this.assets);
+        List<Employee> cloned = new ArrayList<>();
+        for (Employee original : subordinates) {
+            Employee copy = (Employee) original.clone();
+            cloned.add(copy);
+        }
+        clonedEmployee.subordinates = cloned;
+
+        if (superior != null) {
+            clonedEmployee.superior = (Employee) this.superior.clone();
+        }
+        else {
+            clonedEmployee.superior = null;
+        }
+
+        return clonedEmployee;
+    }
 
     @Override
-    public double salary() { return this.salary; }
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        Employee employee = (Employee) obj;
 
+        return this.name.equals(employee.name)
+                && this.dateOfBirth.equals(employee.dateOfBirth)
+                && this.eMailAddress.equals(employee.eMailAddress);
+    }
+
+    @Override
     public String toString() {
         return this.getName() + " "
                 + this.getSurname() + " "
                 + this.id() + " "
                 + this.getEMailAddress();
+    }
+
+    @Override
+    public String id() {
+        return this.id;
+    }
+
+    @Override
+    public double salary() {
+        return this.salary;
     }
 }

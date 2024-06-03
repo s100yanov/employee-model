@@ -9,7 +9,7 @@ public class Expert extends Employee {
     private String id;
     private String department;
     private String division;
-    private static CorrectStructureController structureController;
+    private static final CorrectStructureController structureController;
     private static int totalInstancesCounter;
 
     static {
@@ -69,7 +69,7 @@ public class Expert extends Employee {
         if (this.division != null) {
             return this.division;
         }
-        return this.getDepartment();
+        return this.department;
     }
 
     private void setDivision(String division) {
@@ -195,6 +195,7 @@ public class Expert extends Employee {
         }
     }
 
+    @Override
     public String toString() {
         return this.getName() + " " + this.getSurname()
                 + " " + this.fullId()

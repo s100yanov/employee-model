@@ -18,11 +18,11 @@ public class Employee implements CompanyStaff, Cloneable {
     private List<String> assets;
     private List<Employee> subordinates;
     private Employee superior;
-    private static final AssetsAllocator allocator;
+    private static final AssetsAllocator ALLOCATOR;
     private static int totalCountOfEmployees;
 
     static {
-        allocator = new AssetsAllocator();
+        ALLOCATOR = new AssetsAllocator();
     }
 
     public Employee(String name, String surname, String dateOfBirth, double experienceInYears) throws Exception {
@@ -111,7 +111,7 @@ public class Employee implements CompanyStaff, Cloneable {
     }
 
     private void setAssets() {
-        this.assets = new ArrayList<>(allocator.defaultAssetsAllocator());
+        this.assets = new ArrayList<>(ALLOCATOR.defaultAssetsAllocator());
     }
 
     public List<Employee> getSubordinates() throws CloneNotSupportedException {
@@ -191,7 +191,7 @@ public class Employee implements CompanyStaff, Cloneable {
     }
 
     protected void senioritySpecificAssetsAllocation(int level) {
-        allocator.bonusAssetsAllocator(level, this.assets);
+        ALLOCATOR.bonusAssetsAllocator(level, this.assets);
     }
 
     protected void senioritySpecificSalaryAggregation(double salaryBonus) {

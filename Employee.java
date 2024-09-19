@@ -14,7 +14,7 @@ public class Employee implements CompanyStaff, Cloneable {
     private String id;
     private String eMailAddress;
     private double salary;
-    private final int salaryBase = 1000;
+    private static final int SALARY_BASE;
     private List<String> assets;
     private List<Employee> subordinates;
     private Employee superior;
@@ -22,6 +22,7 @@ public class Employee implements CompanyStaff, Cloneable {
     private static int totalCountOfEmployees;
 
     static {
+        SALARY_BASE = 1000;
         ALLOCATOR = new AssetsAllocator();
     }
 
@@ -179,7 +180,7 @@ public class Employee implements CompanyStaff, Cloneable {
     }
 
     protected int getSalaryBase() {
-        return this.salaryBase;
+        return SALARY_BASE;
     }
 
     public double checkRandomEmployeeSalary(Employee person) throws Exception {
@@ -226,7 +227,7 @@ public class Employee implements CompanyStaff, Cloneable {
             experienceCoefficient = 2.5;
         }
 
-        return (salaryBase * ((1 + (experienceInYears / 10) * experienceCoefficient)));
+        return (SALARY_BASE * ((1 + (experienceInYears / 10) * experienceCoefficient)));
     }
 
     @Override

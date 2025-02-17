@@ -9,17 +9,17 @@ public class Expert extends Employee {
     private String id;
     private String department;
     private String division;
-    private static final CorrectStructureController structureController;
+    private static final CorrectStructureController STRUCTURE_CONTROLLER;
     private static int totalInstancesCounter;
 
     static {
-        structureController = new CorrectStructureController();
+        STRUCTURE_CONTROLLER = new CorrectStructureController();
     }
 
     public Expert(String name, String surname, String dateOfBirth, double experienceInYears,
                   String position, String expertise) throws Exception {
         super(name, surname, dateOfBirth, experienceInYears);
-        structureController.positionAndExpertiseChecker(position, expertise);
+        STRUCTURE_CONTROLLER.positionAndExpertiseChecker(position, expertise);
         expertDesigner(position, expertise);
         setId();
         levelSpecificSalaryBonus();
@@ -104,7 +104,7 @@ public class Expert extends Employee {
         String positionToUpperCase = position.toUpperCase();
         String expertiseToUpperCase = expertise.toUpperCase();
         if (positionToUpperCase.equals("DIRECTOR")) {
-            if (structureController.checkDirectorPositionVacancy(expertiseToUpperCase)) {
+            if (STRUCTURE_CONTROLLER.checkDirectorPositionVacancy(expertiseToUpperCase)) {
                 throw new IllegalArgumentException("This director position already exists!");
             }
         }
@@ -119,7 +119,7 @@ public class Expert extends Employee {
                 companyDepartment = "HEAD";
                 directorPosition = "CEO";
                 directorProfile(companyDepartment, directorPosition, expertiseToUpperCase, directorPosition);  // director position as a last argument instead of positionToUpperCase, because of level assignment in directorProfile method;
-                structureController.occupiedDirectorPositionsUpdater(directorPosition, true);
+                STRUCTURE_CONTROLLER.occupiedDirectorPositionsUpdater(directorPosition, true);
                 break;
             case "OPERATIONS":
             case "ADMINISTRATION":
@@ -128,7 +128,7 @@ public class Expert extends Employee {
                 if (positionToUpperCase.equals("DIRECTOR")) {
                     directorPosition = "COO";
                     directorProfile(companyDepartment, directorPosition, expertiseToUpperCase, positionToUpperCase);
-                    structureController.occupiedDirectorPositionsUpdater(directorPosition, true);
+                    STRUCTURE_CONTROLLER.occupiedDirectorPositionsUpdater(directorPosition, true);
                 } else {
                     expertProfile(companyDepartment, expertPosition, expertiseToUpperCase, positionToUpperCase, division);
                 }
@@ -138,7 +138,7 @@ public class Expert extends Employee {
                 if (positionToUpperCase.equals("DIRECTOR")) {
                     directorPosition = "CTO";
                     directorProfile(companyDepartment, directorPosition, expertiseToUpperCase, positionToUpperCase);
-                    structureController.occupiedDirectorPositionsUpdater(directorPosition, true);
+                    STRUCTURE_CONTROLLER.occupiedDirectorPositionsUpdater(directorPosition, true);
                 } else {
                     expertProfile(companyDepartment, expertPosition, expertiseToUpperCase, positionToUpperCase, division);
                 }
@@ -149,7 +149,7 @@ public class Expert extends Employee {
                 if (positionToUpperCase.equals("DIRECTOR")) {
                     directorPosition = "CMO";
                     directorProfile(companyDepartment, directorPosition, expertiseToUpperCase, positionToUpperCase);
-                    structureController.occupiedDirectorPositionsUpdater(directorPosition, true);
+                    STRUCTURE_CONTROLLER.occupiedDirectorPositionsUpdater(directorPosition, true);
                 } else {
                     expertProfile(companyDepartment, expertPosition, expertiseToUpperCase, positionToUpperCase, division);
                 }
@@ -159,7 +159,7 @@ public class Expert extends Employee {
                 if (positionToUpperCase.equals("DIRECTOR")) {
                     directorPosition = "CFO";
                     directorProfile(companyDepartment, directorPosition, expertiseToUpperCase, positionToUpperCase);
-                    structureController.occupiedDirectorPositionsUpdater(directorPosition, true);
+                    STRUCTURE_CONTROLLER.occupiedDirectorPositionsUpdater(directorPosition, true);
                 } else {
                     expertProfile(companyDepartment, expertPosition, expertiseToUpperCase, positionToUpperCase, division);
                 }
